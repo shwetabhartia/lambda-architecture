@@ -2,7 +2,7 @@
 Building spark application in scala to perform clickstream analysis on purchase data.
 
 ## Overview
-*LogProducer.scala : Generating log for analysis.
+*LogProducer.scala : Generating log for analysis
 *BatchJob.scala : Performing batch analysis on the clickstream data produced by LogProducer.scala using RDD
 
 ## Future Goal
