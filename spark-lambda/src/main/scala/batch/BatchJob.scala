@@ -30,31 +30,40 @@ object BatchJob {
 
     val input: RDD[String] = sc.textFile("file:///F:/Project/Boxes/spark-kafka-cassandra-applying-lambda-architecture/vagrant/data.tsv")
 
-    val inputRDD = input.map{line =>
+    val inputDF = input.flatMap{line =>
       val record = line.split("\\t")
       val MS_IN_HOUR = 1000*60*60
-      Activity(record(0).toLong / MS_IN_HOUR * MS_IN_HOUR, record(1), record(2), record(3), record(4), record(5), record(6))
-    }
+      if(record.length == 7)
+        Some(Activity(record(0).toLong / MS_IN_HOUR * MS_IN_HOUR, record(1), record(2), record(3), record(4), record(5), record(6)))
+      else
+        None
+    }.toDF()
 
-    val keyedByProduct = inputRDD.keyBy(a => (a.product, a.timestamp_hour)).cache()
+    val df = inputDF.select(
+      add_months(from_unixtime(inputDF("timestamp_hour")/1000),1).as("timestamp_hour"),
+      inputDF("referrer"), inputDF("action"), inputDF("prevPage"), inputDF("page"), inputDF("visitor"), inputDF("product")
+    ).cache()
 
-    /*Visitor By Product per hour*/
-    val visitorsByProduct = keyedByProduct
-      .mapValues(a => a.visitor)
-      .distinct()
-      .countByKey()
+    df.registerTempTable("activity")
 
+    /*Visitor by product using Dataframe*/
+    val visitorsByProduct = sqlContext.sql(
+      """select product, timestamp_hour, count(distinct(visitor)) as unique_visitors
+        | from activity
+        | group by product, timestamp_hour
+      """.stripMargin)
 
-    /*Activity by product per hour*/
-    val activityByProduct = keyedByProduct
-      .mapValues{ a =>
-        a.action match {
-          case "purchase" => (1,0,0)
-          case "add_to_cart" => (0,1,0)
-          case "page_view" => (0,0,1)
-        }
-      }
-      .reduceByKey((a,b) => (a._1 + b._1, a._2 + b._2, a._3 + b._3))
+    visitorsByProduct.printSchema()
+
+    /*Activity by product per hour using Dataframe*/
+    val activityByProduct = sqlContext.sql(
+      """select product, timestamp_hour,
+        |sum(case when action = 'purchase' then 1 else 0 end) as purchase_count,
+        |sum(case when action = 'add_to_cart' then 1 else 0 end) as add_to_cart_count,
+        |sum(case when action = 'page_view' then 1 else 0 end) as page_view_count
+        |from activity
+        |group by product, timestamp_hour
+      """.stripMargin)
 
     visitorsByProduct.foreach(println)
     activityByProduct.foreach(println)
