@@ -142,7 +142,6 @@
     <orderEntry type="library" name="Maven: oro:oro:2.0.8" level="project" />
     <orderEntry type="library" name="Maven: org.tachyonproject:tachyon-client:0.8.2" level="project" />
     <orderEntry type="library" name="Maven: commons-lang:commons-lang:2.4" level="project" />
-    <orderEntry type="library" name="Maven: commons-io:commons-io:2.4" level="project" />
     <orderEntry type="library" name="Maven: org.tachyonproject:tachyon-underfs-hdfs:0.8.2" level="project" />
     <orderEntry type="library" name="Maven: org.tachyonproject:tachyon-underfs-s3:0.8.2" level="project" />
     <orderEntry type="library" name="Maven: org.tachyonproject:tachyon-underfs-local:0.8.2" level="project" />
@@ -230,5 +229,6 @@
     <orderEntry type="library" name="Maven: org.apache.thrift:libfb303:0.9.2" level="project" />
     <orderEntry type="library" name="Maven: joda-time:joda-time:2.8.1" level="project" />
     <orderEntry type="library" name="Maven: org.joda:joda-convert:1.7" level="project" />
+    <orderEntry type="library" name="Maven: commons-io:commons-io:2.4" level="project" />
   </component>
 </module>

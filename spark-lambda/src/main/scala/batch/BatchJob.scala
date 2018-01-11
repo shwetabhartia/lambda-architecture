@@ -1,11 +1,8 @@
 package batch
 
-import java.lang.management.ManagementFactory
-
+import utils.SparkUtils._
 import domain.Activity
 import org.apache.spark.rdd.RDD
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.sql.SQLContext
 
 /**
   * Created by Shweta on 8/11/2017.
@@ -13,17 +10,8 @@ import org.apache.spark.sql.SQLContext
 object BatchJob {
   def main(args : Array[String]) : Unit = {
 
-    val conf = new SparkConf()
-      .setAppName("Lambda with Spark")
-      .setMaster("local[*]")
-
-    /*if (ManagementFactory.getRuntimeMXBean.getInputArguments.toString.contains("Intellij Idea")) {
-      System.setProperty("hadoop.home.dir", "C:\\winutils")
-      conf.setMaster("local[*]")
-    }*/
-
-    val sc = new SparkContext(conf)
-    implicit val sqlContext = new SQLContext(sc)
+    val sc = getSparkContext("Lambda with Spark")
+    val sqlContext = getSQLContext(sc)
 
     import org.apache.spark.sql.functions._
     import sqlContext.implicits._
@@ -39,6 +27,8 @@ object BatchJob {
         None
     }.toDF()
 
+    sqlContext.udf.register("UnderExposed",(pageViewCount: Long, purchaseCount: Long) => if (purchaseCount == 0) 0 else pageViewCount / purchaseCount)
+
     val df = inputDF.select(
       add_months(from_unixtime(inputDF("timestamp_hour")/1000),1).as("timestamp_hour"),
       inputDF("referrer"), inputDF("action"), inputDF("prevPage"), inputDF("page"), inputDF("visitor"), inputDF("product")
@@ -48,24 +38,34 @@ object BatchJob {
 
     /*Visitor by product using Dataframe*/
     val visitorsByProduct = sqlContext.sql(
-      """select product, timestamp_hour, count(distinct(visitor)) as unique_visitors
-        | from activity
-        | group by product, timestamp_hour
+      """SELECT product, timestamp_hour, COUNT(DISTINCT(visitor)) AS unique_visitors
+        | FROM activity
+        | GROUP BY product, timestamp_hour
       """.stripMargin)
 
     visitorsByProduct.printSchema()
 
     /*Activity by product per hour using Dataframe*/
     val activityByProduct = sqlContext.sql(
-      """select product, timestamp_hour,
-        |sum(case when action = 'purchase' then 1 else 0 end) as purchase_count,
-        |sum(case when action = 'add_to_cart' then 1 else 0 end) as add_to_cart_count,
-        |sum(case when action = 'page_view' then 1 else 0 end) as page_view_count
-        |from activity
-        |group by product, timestamp_hour
+      """SELECT product, timestamp_hour,
+        |SUM(CASE WHEN action = 'purchase' THEN 1 ELSE 0 END) AS purchase_count,
+        |SUM(CASE WHEN action = 'add_to_cart' THEN 1 ELSE 0 END) AS add_to_cart_count,
+        |SUM(CASE WHEN action = 'page_view' THEN 1 ELSE 0 END) AS page_view_count
+        |FROM activity
+        |GROUP BY product, timestamp_hour
+      """.stripMargin)
+
+    activityByProduct.registerTempTable("activityByProduct")
+
+    val underExposedProducts = sqlContext.sql(
+      """SELECT product, timestamp_hour, UnderExposed(page_view_count, purchase_count) as negative_exposure
+         FROM activityByProduct
+         ORDER BY negative_exposure DESC
+         LIMIT 5
       """.stripMargin)
 
     visitorsByProduct.foreach(println)
     activityByProduct.foreach(println)
   }
+
 }
