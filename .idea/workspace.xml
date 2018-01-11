@@ -1,17 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="d18c6c5b-52b3-4ee7-b18c-480d7be95185" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/.idea/libraries/Maven__commons_io_commons_io_2_4.xml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/lambda-architecture.iml" afterPath="$PROJECT_DIR$/lambda-architecture.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/pom.xml" afterPath="$PROJECT_DIR$/pom.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/spark-lambda/spark-lambda.iml" afterPath="$PROJECT_DIR$/spark-lambda/spark-lambda.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/spark-lambda/src/main/resources/application.conf" afterPath="$PROJECT_DIR$/spark-lambda/src/main/resources/application.conf" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/spark-lambda/src/main/scala/batch/BatchJob.scala" afterPath="$PROJECT_DIR$/spark-lambda/src/main/scala/batch/BatchJob.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/spark-lambda/src/main/scala/clickstream/LogProducer.scala" afterPath="$PROJECT_DIR$/spark-lambda/src/main/scala/clickstream/LogProducer.scala" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/spark-lambda/src/main/scala/config/Settings.scala" afterPath="$PROJECT_DIR$/spark-lambda/src/main/scala/config/Settings.scala" />
-    </list>
+    <list default="true" id="d18c6c5b-52b3-4ee7-b18c-480d7be95185" name="Default" comment="" />
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
     <ignored path="$PROJECT_DIR$/spark-lambda/target/" />
@@ -36,7 +26,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BatchJob.scala" pinned="false" current-in-tab="true">
+      <file leaf-file-name="BatchJob.scala" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/spark-lambda/src/main/scala/batch/BatchJob.scala">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="-383">
@@ -76,6 +66,18 @@
             <state relative-caret-position="0">
               <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="StreamingJob.scala" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/spark-lambda/src/main/scala/streaming/StreamingJob.scala">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="238">
+              <caret line="14" column="35" lean-forward="true" selection-start-line="14" selection-start-column="35" selection-end-line="14" selection-end-column="35" />
+              <folding>
+                <element signature="e#19#80#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -125,7 +127,7 @@
       </MavenImportingSettings>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="7">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="x" value="-15" />
     <option name="y" value="-15" />
     <option name="width" value="2586" />
@@ -252,7 +254,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.LogProducer">
+  <component name="RunManager" selected="Application.StreamingJob">
     <configuration name="BatchJob" type="Application" factoryName="Application" temporary="true">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
         <pattern>
@@ -572,8 +574,8 @@
     </list>
     <recent_temporary>
       <list size="3">
-        <item index="0" class="java.lang.String" itemvalue="Application.LogProducer" />
-        <item index="1" class="java.lang.String" itemvalue="Application.StreamingJob" />
+        <item index="0" class="java.lang.String" itemvalue="Application.StreamingJob" />
+        <item index="1" class="java.lang.String" itemvalue="Application.LogProducer" />
         <item index="2" class="java.lang.String" itemvalue="Application.BatchJob" />
       </list>
     </recent_temporary>
@@ -600,19 +602,20 @@
       <workItem from="1515028624055" duration="401000" />
       <workItem from="1515172451838" duration="3057000" />
       <workItem from="1515625890418" duration="4534000" />
-      <workItem from="1515711306897" duration="360000" />
+      <workItem from="1515711306897" duration="659000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="13981000" />
+    <option name="totallyTimeSpent" value="14280000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-6" y="-6" width="1292" height="692" extended-state="7" />
+    <frame x="-6" y="-6" width="1292" height="692" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Java Enterprise" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
@@ -638,7 +641,6 @@
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
@@ -1019,16 +1021,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/spark-lambda/src/main/scala/streaming/StreamingJob.scala">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="18" column="111" lean-forward="false" selection-start-line="18" selection-start-column="111" selection-end-line="18" selection-end-column="111" />
-          <folding>
-            <element signature="e#19#80#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/spark-lambda/src/main/scala/utils/SparkUtils.scala">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="127">
@@ -1087,6 +1079,16 @@
           <caret line="2" column="14" lean-forward="false" selection-start-line="2" selection-start-column="14" selection-end-line="2" selection-end-column="14" />
           <folding>
             <element signature="e#299#338#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/spark-lambda/src/main/scala/streaming/StreamingJob.scala">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="14" column="35" lean-forward="true" selection-start-line="14" selection-start-column="35" selection-end-line="14" selection-end-column="35" />
+          <folding>
+            <element signature="e#19#80#0" expanded="true" />
           </folding>
         </state>
       </provider>
