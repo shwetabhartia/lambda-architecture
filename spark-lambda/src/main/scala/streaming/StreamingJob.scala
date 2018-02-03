@@ -1,10 +1,11 @@
 package streaming
 
-import domain.{Activity, ActivityByProduct}
+import domain.{Activity, ActivityByProduct, VisitorsByProduct}
 import org.apache.spark.SparkContext
-import org.apache.spark.streaming.{Duration, Seconds, StreamingContext}
+import org.apache.spark.streaming._
 import utils.SparkUtils._
-
+import functions._
+import com.twitter.algebird.HyperLogLogMonoid
 
 object StreamingJob {
   def main(args: Array[String]) : Unit = {
@@ -31,7 +32,10 @@ object StreamingJob {
           else
             None
         }
-      })
+      }).cache()
+
+      /*Acivity by product by timestamp hour*/
+      val activityStateSpec = StateSpec.function(mapActivityStateFunc).timeout(Minutes(120))
 
       val statefulActivityByProduct = activityStream.transform(rdd => {
         val df = rdd.toDF()
@@ -47,7 +51,42 @@ object StreamingJob {
         activityByProduct.map{r => ((r.getString(0), r.getLong(1)),
           ActivityByProduct(r.getString(0), r.getLong(1), r.getLong(2), r.getLong(3), r.getLong(4))
           )}
-      }).updateStateByKey((newItemsPerKey: Seq[ActivityByProduct], currentState: Option[(Long, Long, Long, Long)]) => {
+      }).mapWithState(activityStateSpec)
+
+      val activityStateSnapshot = statefulActivityByProduct.stateSnapshots()
+
+      activityStateSnapshot
+        .reduceByKeyAndWindow(
+          (a,b) => b,
+          (x,y) => x,
+          Seconds(30/4*4)
+        )
+        .foreachRDD(rdd => rdd.map(sr => ActivityByProduct(sr._1._1, sr._1._2, sr._2._1, sr._2._2, sr._2._3))
+          .toDF().registerTempTable("ActivityByProduct"))
+
+      //statefulActivityByProduct.print(10)
+
+      /*Unique Visitors by product*/
+      val visitorStateSpec = StateSpec.function(mapVisitorsStateFunc).timeout(Minutes(120))
+
+      val hll = new HyperLogLogMonoid(12)
+      val statefulVisitorsByProduct = activityStream.map(a => {
+        ((a.product, a.timestamp_hour), hll(a.visitor.getBytes))
+      }).mapWithState(visitorStateSpec)
+
+      val visitorStateSnapshot = statefulVisitorsByProduct.stateSnapshots()
+
+      visitorStateSnapshot
+        .reduceByKeyAndWindow(
+          (a,b) => b,
+          (x,y) => x,
+           Seconds(30/4*4)
+        )
+        .foreachRDD(rdd => rdd.map(sr => VisitorsByProduct(sr._1._1, sr._1._2, sr._2.approximateSize.estimate))
+          .toDF().registerTempTable("VisitorsByProduct"))
+
+
+        /*updateStateByKey((newItemsPerKey: Seq[ActivityByProduct], currentState: Option[(Long, Long, Long, Long)]) => {
        var (prevTimeStamp, purchase_count, add_to_cart_count, page_view_count) = currentState.getOrElse((System.currentTimeMillis(), 0L, 0L, 0L))
         var result : Option[(Long, Long, Long, Long)] = null
 
@@ -68,7 +107,7 @@ object StreamingJob {
         }
 
         result
-      })
+      })*/
 
       ssc
     }
