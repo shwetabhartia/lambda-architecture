@@ -1,11 +1,15 @@
 package streaming
 
 import domain.{Activity, ActivityByProduct, VisitorsByProduct}
+import _root_.kafka.serializer.{DefaultDecoder, StringDecoder}
 import org.apache.spark.SparkContext
 import org.apache.spark.streaming._
 import utils.SparkUtils._
 import functions._
 import com.twitter.algebird.HyperLogLogMonoid
+import config.Settings
+import org.apache.spark.storage.StorageLevel
+import org.apache.spark.streaming.kafka.KafkaUtils
 
 object StreamingJob {
   def main(args: Array[String]) : Unit = {
@@ -16,6 +20,20 @@ object StreamingJob {
 
     def streamingApp(sc : SparkContext, batchDuration : Duration) = {
       val ssc = new StreamingContext(sc, batchDuration)
+
+      //Kafka changes
+      val wlc = Settings.WebLogGen
+      val topic = wlc.kafkaTopics
+
+      val kafkaParams = Map(
+        "zookeeper.connect" -> "localhost:2181",
+        "group.id" -> "lambda",
+        "auto.offset.reset" -> "largest"
+      )
+
+      val kafkaStream = KafkaUtils.createStream[String, String, StringDecoder, StringDecoder](
+        ssc,kafkaParams, Map(topic -> 1), StorageLevel.MEMORY_AND_DISK)
+        .map(_._2)
 
       val inputPath = isIDE match {
         case true => "file:///F:/Project/Boxes/spark-kafka-cassandra-applying-lambda-architecture/vagrant/input"

@@ -18,6 +18,7 @@ object Settings {
     lazy val filePath = webLogGen.getString("file_path")
     lazy val destinationPath = webLogGen.getString("destination_path")
     lazy val numberOfFiles = webLogGen.getInt("number_of_files")
+    lazy val kafkaTopics = webLogGen.getString("kafka_topic")
 
   }
 }
