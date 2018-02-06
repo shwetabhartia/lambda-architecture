@@ -25,6 +25,8 @@ object StreamingJob {
       val wlc = Settings.WebLogGen
       val topic = wlc.kafkaTopics
 
+      //Kafka Receiver Approach
+      /*
       val kafkaParams = Map(
         "zookeeper.connect" -> "localhost:2181",
         "group.id" -> "lambda",
@@ -34,22 +36,28 @@ object StreamingJob {
       val kafkaStream = KafkaUtils.createStream[String, String, StringDecoder, StringDecoder](
         ssc,kafkaParams, Map(topic -> 1), StorageLevel.MEMORY_AND_DISK)
         .map(_._2)
+        */
 
-      val inputPath = isIDE match {
+      //Kafka Direct Approach
+      val kafkaDirectParams = Map(
+        "metadata.broker.list" -> "localhost:9092",
+        "group.id" -> "lambda",
+        "auto.offset.reset" -> "smallest"
+      )
+
+      val kafkaDirectStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](
+        ssc, kafkaDirectParams, Set(topic)
+      ).map(_._2)
+
+      //Batch and Streaming
+      /*val inputPath = isIDE match {
         case true => "file:///F:/Project/Boxes/spark-kafka-cassandra-applying-lambda-architecture/vagrant/input"
         case false => "file:///vagrant/input"
       }
+      val textDStream = ssc.textFileStream(inputPath)*/
 
-      val textDStream = ssc.textFileStream(inputPath)
-      val activityStream = textDStream.transform(input => {
-        input.flatMap{line =>
-          val record = line.split("\\t")
-          val MS_IN_HOUR = 1000*60*60
-          if(record.length == 7)
-            Some(Activity(record(0).toLong / MS_IN_HOUR * MS_IN_HOUR, record(1), record(2), record(3), record(4), record(5), record(6)))
-          else
-            None
-        }
+      val activityStream = kafkaDirectStream.transform(input => {
+        functions.rddToRDDActivity(input)
       }).cache()
 
       /*Acivity by product by timestamp hour*/
