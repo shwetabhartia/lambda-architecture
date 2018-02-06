@@ -2,12 +2,11 @@ package clickstream
 
 import java.io.FileWriter
 import java.util.Properties
-
 import config.Settings
 import org.apache.commons.io.FileUtils
 import org.apache.kafka.clients.producer.{KafkaProducer, Producer, ProducerConfig, ProducerRecord}
-
 import scala.util.Random
+
 /**
   * Created by Shweta on 8/11/2017.
   */

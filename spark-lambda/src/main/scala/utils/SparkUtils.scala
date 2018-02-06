@@ -1,12 +1,13 @@
 package utils
 
 import java.lang.management.ManagementFactory
-
 import org.apache.spark.sql.SQLContext
 import org.apache.spark.streaming.{Duration, StreamingContext}
 import org.apache.spark.{SparkConf, SparkContext}
 
-
+/**
+  * Created by Shweta on 12/18/2017.
+  */
 object SparkUtils {
   val isIDE = {
     ManagementFactory.getRuntimeMXBean.getInputArguments.toString.contains("IntelliJ IDEA")

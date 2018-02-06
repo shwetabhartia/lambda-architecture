@@ -3,14 +3,21 @@ package streaming
 import domain.{Activity, ActivityByProduct, VisitorsByProduct}
 import _root_.kafka.serializer.{DefaultDecoder, StringDecoder}
 import org.apache.spark.SparkContext
-import org.apache.spark.streaming._
+import org.apache.spark.sql.functions._
+import org.apache.spark.streaming.{Duration, Minutes, Seconds, StateSpec, StreamingContext}
+import org.apache.spark.streaming.kafka.KafkaUtils
 import utils.SparkUtils._
 import functions._
 import com.twitter.algebird.HyperLogLogMonoid
 import config.Settings
+import kafka.common.TopicAndPartition
+import kafka.message.MessageAndMetadata
+import org.apache.spark.sql.SaveMode
 import org.apache.spark.storage.StorageLevel
-import org.apache.spark.streaming.kafka.KafkaUtils
 
+/**
+  * Created by Shweta on 12/16/2017.
+  */
 object StreamingJob {
   def main(args: Array[String]) : Unit = {
     val sc = getSparkContext("Lambda with Spark")
@@ -45,9 +52,24 @@ object StreamingJob {
         "auto.offset.reset" -> "smallest"
       )
 
-      val kafkaDirectStream = KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](
-        ssc, kafkaDirectParams, Set(topic)
-      ).map(_._2)
+      val hdfsPath = wlc.hdfsPath
+      val hdfsData = sqlContext.read.parquet(hdfsPath)
+
+      val fromOffsets = hdfsData.groupBy("topic", "kafkaPartition").agg(max("untilOffset").as("untilOffset"))
+        .collect().map{ row =>
+        (TopicAndPartition(row.getAs[String]("topic"), row.getAs[Int]("kafkaPartition")), row.getAs[String]("untilOffset").toLong + 1)
+      }.toMap
+
+      val kafkaDirectStream = fromOffsets.isEmpty match {
+        case true =>
+          KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder](
+            ssc, kafkaDirectParams, Set(topic)
+          )
+        case false =>
+          KafkaUtils.createDirectStream[String, String, StringDecoder, StringDecoder, (String, String)](
+            ssc, kafkaDirectParams, fromOffsets, { mmd : MessageAndMetadata[String, String] => (mmd.key(), mmd.message()) }
+          )
+      }
 
       //Batch and Streaming
       /*val inputPath = isIDE match {
@@ -59,6 +81,16 @@ object StreamingJob {
       val activityStream = kafkaDirectStream.transform(input => {
         functions.rddToRDDActivity(input)
       }).cache()
+
+      activityStream.foreachRDD{ rdd =>
+        val activityDF = rdd.toDF()
+          .selectExpr("timestamp_hour", "referrer", "action", "prevPage", "page", "visitor", "product",
+            "inputProps.topic as topic", "inputProps.kafkaPartition as kafkaPartition", "inputProps.fromOffset as fromOffset",
+          "inputProps.untilOffset as untilOffset")
+        activityDF.write.partitionBy("topic", "kafkaPartition", "timestamp_hour")
+          .mode(SaveMode.Append)
+          .parquet(hdfsPath)
+      }
 
       /*Acivity by product by timestamp hour*/
       val activityStateSpec = StateSpec.function(mapActivityStateFunc).timeout(Minutes(120))
